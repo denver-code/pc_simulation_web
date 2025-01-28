@@ -1,101 +1,120 @@
-import Image from "next/image";
+"use client"
 
-export default function Home() {
+import { useState } from "react"
+import { Card } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Button } from "@/components/ui/button"
+import Editor from "@/components/editor"
+import Terminal from "@/components/terminal"
+import Registers from "@/components/registers"
+import MemoryAddresses from "@/components/memory-addresses"
+import CPU from "@/lib/cpu"
+export default function PCSimulator() {
+  const [searchQuery, setSearchQuery] = useState("")
+  const [code, setCode] = useState("")
+  const [output, setOutput] = useState("")
+  const [cpu] = useState(() => new CPU())
+
+  const handleRun = () => {
+    setOutput('');
+    const lines = code.split('\n');
+    let newOutput = '';
+    let i = 0;
+    while (i < lines.length) {
+      let line = lines[i].trim();
+      if (line === '' || line.startsWith(';')) {
+        i++;
+        continue;
+      } 
+
+      // remove comments
+      if (line.includes(';')) {
+        line = line.split(';')[0].trim();
+      }
+
+      if (line.startsWith('IF')) {
+        const ifBlock = [];
+        let j = i + 1;
+        while (j < lines.length && lines[j].startsWith('  ')) {
+          ifBlock.push(lines[j].trim());
+          j++;
+        }
+        const elseBlock = [];
+        if (j < lines.length && lines[j].trim() === 'ELSE') {
+          j++;
+          while (j < lines.length && lines[j].startsWith('  ')) {
+            elseBlock.push(lines[j].trim());
+            j++;
+          }
+        }
+        newOutput += executeIfStatement(cpu, line, ifBlock, elseBlock);
+        i = j;
+      } else {
+        newOutput += cpu.execute(line);
+        i++;
+      }
+    }
+    setOutput(prevOutput => prevOutput + newOutput);
+  }
+
+  const executeIfStatement = (cpu: CPU, condition: string, ifBlock: string[], elseBlock: string[]) => {
+    let output = cpu.execute(condition);
+    const [leftOperand, operator, rightOperand] = cpu.parseCondition(condition.slice(3));
+    const leftValue = cpu.parseImmediate(leftOperand);
+    const rightValue = cpu.parseImmediate(rightOperand);
+    const conditionMet = cpu.evaluateCondition(leftValue, operator, rightValue);
+
+    if (conditionMet) {
+      output += cpu.executeBlock(ifBlock);
+    } else if (elseBlock.length > 0) {
+      output += cpu.executeBlock(elseBlock);
+    }
+
+    return output;
+  }
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="min-h-screen bg-background p-4 grid gap-4" style={{
+      gridTemplateColumns: "1fr 400px",
+      gridTemplateRows: "auto auto 1fr auto",
+      gridTemplateAreas: `
+        "editor terminal"
+        "editor registers"
+        "editor memory"
+        "editor search"
+      `
+    }}>
+      <Card className="p-4" style={{ gridArea: "editor" }}>
+        <h2 className="text-lg font-semibold mb-4">Editor</h2>
+        <Editor code={code} setCode={setCode} />
+        <Button onClick={handleRun} className="mt-4">Run</Button>
+      </Card>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      <Card className="p-4" style={{ gridArea: "terminal" }}>
+        <h2 className="text-lg font-semibold mb-4">Terminal</h2>
+        <Terminal output={output} />
+      </Card>
+
+      <Card className="p-4" style={{ gridArea: "registers" }}>
+        <h2 className="text-lg font-semibold mb-4">Registers</h2>
+        <Registers registers={cpu.registers} />
+      </Card>
+
+      <Card className="p-4" style={{ gridArea: "memory" }}>
+        <h2 className="text-lg font-semibold mb-4">Memory Addresses</h2>
+        <MemoryAddresses memory={cpu.ram} />
+      </Card>
+
+      <div style={{ gridArea: "search" }}>
+        <Input
+          type="search"
+          placeholder="Search..."
+          className="w-full"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
     </div>
-  );
+  )
 }
