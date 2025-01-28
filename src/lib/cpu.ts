@@ -193,7 +193,7 @@ class CPU {
             // log(`OUT: Output ${dest} = ${value.toString(2).padStart(8, '0')}`);
 
             // Output the value to the console
-            output += `OUT: Output ${dest} = ${value.toString(2).padStart(8, '0')}`;
+            output += `OUT: Output ${dest} = ${value.toString(2).padStart(8, '0')}\n`;
           }
           break;
         case 'IF':
@@ -211,6 +211,20 @@ class CPU {
 
             // The actual execution of the IF block will be handled in the main loop
             // that processes all instructions
+          }
+          break;
+        case 'CLR':
+          {
+            const dest = parts[1];
+            if (dest.startsWith('R')) {
+              const regIndex = this.parseRegister(dest);
+              this.registers[regIndex] = 0;
+              log(`CLR: Cleared R${regIndex} = ${this.registers[regIndex].toString(2).padStart(8, '0')}`);
+            } else {
+              const address = this.parseAddress(dest);
+              this.ram[address] = 0;
+              log(`CLR: Cleared ${address.toString(16).padStart(2, '0')} = ${this.ram[address].toString(2).padStart(8, '0')}`);
+            }
           }
           break;
         case 'HALT':

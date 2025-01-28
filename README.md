@@ -1,6 +1,17 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
+Sample asm
+```
+VER = 0
+INIT [0x0A] = 5
+MOV R1, [0x0A]
+
+IF R1 == 5
+  OUT 1
+ELSE
+  OUT 0
+```
 
 First, run the development server:
 

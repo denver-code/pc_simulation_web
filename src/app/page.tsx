@@ -86,9 +86,14 @@ export default function PCSimulator() {
       `
     }}>
       <Card className="p-4" style={{ gridArea: "editor" }}>
+        {/* row */}
+        <div className="flex justify-between">
         <h2 className="text-lg font-semibold mb-4">Editor</h2>
+        <Button onClick={handleRun} className="">Run</Button>
+        </div>
+        
         <Editor code={code} setCode={setCode} />
-        <Button onClick={handleRun} className="mt-4">Run</Button>
+        
       </Card>
 
       <Card className="p-4" style={{ gridArea: "terminal" }}>
@@ -106,7 +111,7 @@ export default function PCSimulator() {
         <MemoryAddresses memory={cpu.ram} />
       </Card>
 
-      <div style={{ gridArea: "search" }}>
+      {/* <div style={{ gridArea: "search" }}>
         <Input
           type="search"
           placeholder="Search..."
@@ -114,7 +119,7 @@ export default function PCSimulator() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-      </div>
+      </div> */}
     </div>
   )
 }
