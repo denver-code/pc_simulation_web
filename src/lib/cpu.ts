@@ -238,7 +238,8 @@ class CPU {
           throw new Error(`Unknown instruction: ${parts[0]}`);
       }
     } catch (error) {
-      log(`Error: ${(error as Error).message}`);
+      // log(`Error: ${(error as Error).message}`);
+      
     }
 
     return output;
