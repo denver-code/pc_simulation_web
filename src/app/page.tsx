@@ -9,12 +9,16 @@ import Editor from "@/components/editor"
 import Terminal from "@/components/terminal"
 import Registers from "@/components/registers"
 import MemoryAddresses from "@/components/memory-addresses"
+import Documentation from "@/components/documentation"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
 import CPU from "@/lib/cpu"
 export default function PCSimulator() {
   const [searchQuery, setSearchQuery] = useState("")
   const [code, setCode] = useState("")
   const [output, setOutput] = useState("")
   const [cpu] = useState(() => new CPU())
+  const [activeTab, setActiveTab] = useState("code")
 
   const handleRun = () => {
     setOutput('');
@@ -86,13 +90,23 @@ export default function PCSimulator() {
       `
     }}>
       <Card className="p-4" style={{ gridArea: "editor" }}>
-        {/* row */}
-        <div className="flex justify-between">
-        <h2 className="text-lg font-semibold mb-4">Editor</h2>
-        <Button onClick={handleRun} className="">Run</Button>
-        </div>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
+          <div className="flex justify-between items-center mb-4">
+            <TabsList>
+              <TabsTrigger value="code">Code</TabsTrigger>
+              <TabsTrigger value="docs">Documentation</TabsTrigger>
+            </TabsList>
+            <Button onClick={handleRun}>Run</Button>
+          </div>
+          <TabsContent value="code" className="flex-grow">
+            <Editor code={code} setCode={setCode} />
+          </TabsContent>
+          <TabsContent value="docs" className="flex-grow">
+            <Documentation />
+          </TabsContent>
+        </Tabs>
+
         
-        <Editor code={code} setCode={setCode} />
         
       </Card>
 
