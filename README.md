@@ -1,27 +1,36 @@
+# PC Simulation
+Based on [this Rust project of mine](https://github.com/denver-code/pc_simulation_rs)
+
+Basic web app that will simulate some of the flows on computer, including: 
+- RAM  (`256 bytes`) - can be read, written and dumped for inspection.    
+  
+  Addressed via hexadecimal addressed. 
+
+  Each memory cell is 8 bits (1 byte) wide
+- CPU - 8-bit CPU with 8 general-purpose registers.
+  ATM asm-like code directly executed by the CPU, I'm not sure how it supposed to be.   
+
+  CPU supports `8 general-purpose 8-bit` registers to hold data during execution.  
+- More on the way, but it's still area for a research.  
+
+Simulation has option to write simple assembly-like programs with small set of instructions:  
+- `VER` - Toggle verbosity to enable/disable detailed execution logs.
+- `MOV QMOV` - Assingning RAM/Another Register's/Immediate Value to the register or memory.
+- `INIT` - Initialize memory addresses with values.
+- `ADD SUB MUL DIV` -  basic arythemitcs
+- `OUT` - Output register or memory/values.
+- `CLEAR` - Clear the register or memory
+- `HALT` - Stop the execution.
+- `IF/ELSE` -  If and else statement that supports basic operations between registers, memory and values.
+
+Read docs on the website for more information and examples.
+
 ## Getting Started
-https://github.com/denver-code/pc_simulation_rs
-Based on the above project, this project is a web-based simulator for the PC Simulation project. 
-
-Sample asm
-```
-
-```
-
-First, run the development server:
-
 ```bash
+git clone https://github.com/denver-code/pc_simulation_web
+cd pc_simulation_web
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-

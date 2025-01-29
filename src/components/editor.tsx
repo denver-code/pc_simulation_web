@@ -11,6 +11,26 @@ interface CodeEditorProps {
 export default function CodeEditor({ code, setCode }: CodeEditorProps) {
   const editorRef = useRef<any>(null)
 
+  // when first on page - use sample code
+  useEffect(() => {
+    if (code === "") {
+      setCode(`; Sample program
+VER = 1                 ; Enable verbosity
+INIT [0x0A] = 5         ; Initialize memory address 0x0A to 5
+MOV R1, [0x0A]          ; Move the value from memory address 0x0A to register R1
+
+IF R1 == 5              ; Check if the value in R1 is 5
+  OUT 1                 ; Output 1
+ELSE
+  OUT 0                 ; Output 0
+
+CLR R1                  ; Clear register R1
+CLR [0x0A]              ; Clear memory address 0x0A
+VER = 0                 ; Disable verbosity
+`)
+    }
+  }, [])
+
   const handleEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor
 
